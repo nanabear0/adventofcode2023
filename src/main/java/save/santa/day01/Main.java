@@ -28,6 +28,7 @@ public class Main {
 
     public static int process(Pattern pattern) throws IOException {
         URL resource = Main.class.getClassLoader().getResource("day01-input.txt");
+        assert resource != null;
         try (Stream<String> lines = Files.lines(Path.of(resource.getFile().substring(1)))) {
             return lines.map(line -> doThing(pattern, line)).reduce(Integer::sum).orElse(0);
         }
