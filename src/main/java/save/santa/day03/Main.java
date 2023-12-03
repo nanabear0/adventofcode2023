@@ -63,7 +63,7 @@ public class Main {
         y = 0;
         long sum = 0;
         for (String line : lines) {
-            Matcher matcher = Pattern.compile("[^.\\d]").matcher(line);
+            Matcher matcher = Pattern.compile("\\*").matcher(line);
             while (matcher.find()) {
                 int x = matcher.start();
                 int finalY = y;
