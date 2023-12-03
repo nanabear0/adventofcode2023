@@ -17,10 +17,10 @@ public class Main {
     }
 
     static class Number {
-        int number;
+        long number;
         List<Point> range;
 
-        public Number(int number, List<Point> range) {
+        public Number(long number, List<Point> range) {
             this.range = range;
             this.number = number;
         }
@@ -41,39 +41,42 @@ public class Main {
     public static void part02() throws IOException {
         URL resource = Main.class.getClassLoader().getResource("day03-input.txt");
         assert resource != null;
-        List<Number> numbers = new ArrayList<>();
+        Map<Point, Number> numbers = new HashMap<>();
         List<String> lines = Files.lines(Path.of(resource.getFile())).toList();
         int y = 0;
         for (String line : lines) {
             Matcher matcher = Pattern.compile("\\d+").matcher(line);
             while (matcher.find()) {
-                int number = Integer.parseInt(matcher.group());
+                long number = Long.parseLong(matcher.group());
                 List<Point> range = new ArrayList<>();
                 for (int x = matcher.start(); x < matcher.end(); x++) {
                     range.add(new Point(x, y));
                 }
-                numbers.add(new Number(number, range));
+                Number n = new Number(number, range);
+                for (Point r : range) {
+                    numbers.put(r, n);
+                }
             }
             y++;
         }
-        System.out.println("Done processing numbers.");
 
         y = 0;
-        int sum = 0;
+        long sum = 0;
         for (String line : lines) {
             Matcher matcher = Pattern.compile("[^.\\d]").matcher(line);
             while (matcher.find()) {
                 int x = matcher.start();
                 int finalY = y;
 
-                Map<Point, Integer> selectedPoints = new HashMap<>();
+                Map<Point, Long> selectedPoints = new HashMap<>();
                 Arrays.stream(dists)
                         .map(dist -> new Point(dist.x + x, dist.y + finalY))
-                        .flatMap(point -> numbers.stream().filter(number -> number.range.contains(point)))
+                        .filter(numbers::containsKey)
+                        .map(numbers::get)
                         .forEach(number -> selectedPoints.put(number.range.get(0), number.number));
 
                 if (selectedPoints.size() == 2) {
-                    sum += selectedPoints.values().stream().reduce((n, m) -> n * m).orElse(0);
+                    sum += selectedPoints.values().stream().reduce((n, m) -> n * m).orElse(0L);
                 }
             }
             y++;
@@ -84,26 +87,27 @@ public class Main {
     public static void part01() throws IOException {
         URL resource = Main.class.getClassLoader().getResource("day03-input.txt");
         assert resource != null;
-        List<Number> numbers = new ArrayList<>();
+        Map<Point, Number> numbers = new HashMap<>();
         List<String> lines = Files.lines(Path.of(resource.getFile())).toList();
         int y = 0;
         for (String line : lines) {
             Matcher matcher = Pattern.compile("\\d+").matcher(line);
             while (matcher.find()) {
-                int number = Integer.parseInt(matcher.group());
+                long number = Long.parseLong(matcher.group());
                 List<Point> range = new ArrayList<>();
                 for (int x = matcher.start(); x < matcher.end(); x++) {
                     range.add(new Point(x, y));
                 }
-                numbers.add(new Number(number, range));
+                Number n = new Number(number, range);
+                for (Point r : range) {
+                    numbers.put(r, n);
+                }
             }
             y++;
         }
-        System.out.println("Done processing numbers.");
-
 
         y = 0;
-        Map<Point, Integer> selectedPoints = new HashMap<>();
+        Map<Point, Long> selectedPoints = new HashMap<>();
         for (String line : lines) {
             Matcher matcher = Pattern.compile("[^.\\d]").matcher(line);
             while (matcher.find()) {
@@ -111,12 +115,13 @@ public class Main {
                 int finalY = y;
                 Arrays.stream(dists)
                         .map(dist -> new Point(dist.x + x, dist.y + finalY))
-                        .flatMap(point -> numbers.stream().filter(number -> number.range.contains(point)))
+                        .filter(numbers::containsKey)
+                        .map(numbers::get)
                         .forEach(number -> selectedPoints.put(number.range.get(0), number.number));
             }
             y++;
         }
-        int sum = selectedPoints.values().stream().reduce(Integer::sum).orElse(0);
+        long sum = selectedPoints.values().stream().reduce(Long::sum).orElse(0L);
         System.out.println("part01: " + sum);
     }
 }
