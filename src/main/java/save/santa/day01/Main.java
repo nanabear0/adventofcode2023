@@ -19,11 +19,11 @@ public class Main {
     }
 
     public static void part01() throws IOException {
-        System.out.printf("part01: %d\n", process(Pattern.compile("[123456789]")));
+        System.out.printf("part01: %d\n", process(Pattern.compile("(\\d)")));
     }
 
     public static void part02() throws IOException {
-        System.out.printf("part02: %d\n", process(Pattern.compile("one|two|three|four|five|six|seven|eight|nine|1|2|3|4|5|6|7|8|9")));
+        System.out.printf("part02: %d\n", process(Pattern.compile("(?=(one|two|three|four|five|six|seven|eight|nine|\\d))")));
     }
 
     public static int process(Pattern pattern) throws IOException {
@@ -49,12 +49,10 @@ public class Main {
     public static int doThing(Pattern pattern, String input) {
         Matcher regexMatcher = pattern.matcher(input);
         List<String> l = new LinkedList<>();
-        if (regexMatcher.find()) {
-            do {
-                String match = regexMatcher.group();
-                if (Character.isDigit(match.charAt(0))) l.add(match);
-                else l.add(replaces.get(match));
-            } while (regexMatcher.find(regexMatcher.start() + 1));
+        while (regexMatcher.find()) {
+            String match = regexMatcher.group(1);
+            if (Character.isDigit(match.charAt(0))) l.add(match);
+            else l.add(replaces.get(match));
         }
         return Integer.parseInt(l.getFirst() + l.getLast());
     }
