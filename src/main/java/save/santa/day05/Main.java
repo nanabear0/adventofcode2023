@@ -26,7 +26,10 @@ public class Main {
         List<Pair<Long, Long>> seedRanges = IntStream.range(0, seedDef.size() / 2).mapToObj(start -> Pair.with(seedDef.get(start * 2), seedDef.get(start * 2) + seedDef.get(start * 2 + 1) - 1)).toList();
         List<List<Triplet<Long, Long, Long>>> mappings = parseMappings(lines);
 
-        long result = seedRanges.stream().flatMap(seedRange -> seedToLocationRange(seedRange, mappings).stream()).map(Pair::getValue0).min(Long::compareTo).orElse(0L);
+        long result = seedRanges.parallelStream()
+                .flatMap(seedRange -> seedToLocationRange(seedRange, mappings).stream())
+                .map(Pair::getValue0)
+                .min(Long::compareTo).orElseThrow();
 
         System.out.println("part02: " + result);
     }
@@ -104,7 +107,9 @@ public class Main {
         List<Long> seeds = Arrays.stream(lines.get(0).split(": ")[1].split(" +")).map(Long::parseLong).toList();
         List<List<Triplet<Long, Long, Long>>> mappings = parseMappings(lines);
 
-        List<Long> locations = seeds.stream().map(seed -> seedToLocation(seed, mappings)).toList();
-        System.out.println("part01: " + locations.stream().min(Long::compareTo).orElseThrow());
+        long result = seeds.parallelStream()
+                .map(seed -> seedToLocation(seed, mappings))
+                .min(Long::compareTo).orElseThrow();
+        System.out.println("part01: " + result);
     }
 }
