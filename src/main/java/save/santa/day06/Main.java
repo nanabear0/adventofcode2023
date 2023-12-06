@@ -50,8 +50,8 @@ public class Main {
 
     public static long quadratic(long t, long d) {
         double q = Math.pow(t * t - 4 * d, 0.5);
-        double v1 = Math.floor((t - q) / 2 + 0.000000000001);
-        double v2 = Math.ceil((t + q) / 2 - 0.000000000001);
+        double v1 = Math.floor((t - q) / 2);
+        double v2 = Math.ceil((t + q) / 2);
         return (long) (v2 - v1 - 1);
     }
 }
