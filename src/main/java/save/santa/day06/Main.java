@@ -3,6 +3,10 @@ package save.santa.day06;
 import org.javatuples.Pair;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,39 +23,41 @@ public class Main {
     public static void part01() throws IOException {
         URL resource = Main.class.getClassLoader().getResource("day06-input.txt");
         assert resource != null;
-        List<List<Integer>> lines = Files.lines(Path.of(resource.getFile().substring(1)))
+        List<List<BigInteger>> lines = Files.lines(Path.of(resource.getFile().substring(1)))
                 .map(line ->
                         Arrays.stream(line.substring(9).trim().split(" +"))
-                                .map(Integer::parseInt).toList())
+                                .map(BigInteger::new).toList())
                 .toList();
-        List<Pair<Integer, Integer>> races = IntStream.range(0, lines.get(0).size())
+        List<Pair<BigInteger, BigInteger>> races = IntStream.range(0, lines.get(0).size())
                 .mapToObj(i -> Pair.with(lines.get(0).get(i), lines.get(1).get(i)))
                 .toList();
 
-        long result = races.parallelStream()
+        BigInteger result = races.parallelStream()
                 .map(pair -> quadratic(pair.getValue0(), pair.getValue1()))
-                .reduce((x, y) -> x * y).orElseThrow();
+                .reduce(BigInteger::multiply).orElseThrow();
         System.out.println("part01: " + result);
     }
 
     public static void part02() throws IOException {
         URL resource = Main.class.getClassLoader().getResource("day06-input.txt");
         assert resource != null;
-        List<Long> lines = Files.lines(Path.of(resource.getFile().substring(1)))
+        List<BigInteger> lines = Files.lines(Path.of(resource.getFile().substring(1)))
                 .map(line ->
-                        Long.parseLong(line.substring(9).replaceAll(" ", "")))
+                        new BigInteger(line.substring(9).replaceAll(" ", "")))
                 .toList();
-        long time = lines.get(0);
-        long distance = lines.get(1);
+        BigInteger time = lines.get(0);
+        BigInteger distance = lines.get(1);
 
-        long result = quadratic(time, distance);
+        BigInteger result = quadratic(time, distance);
         System.out.println("part02: " + result);
     }
 
-    public static long quadratic(long t, long d) {
-        double q = Math.pow(t * t - 4 * d, 0.5);
-        double v1 = Math.floor((t - q) / 2);
-        double v2 = Math.ceil((t + q) / 2);
-        return (long) (v2 - v1 - 1);
+    public static BigInteger quadratic(BigInteger _t, BigInteger _d) {
+        BigDecimal t = new BigDecimal(_t);
+        BigDecimal d = new BigDecimal(_d);
+        BigDecimal q = t.pow(2).subtract(d.multiply(BigDecimal.valueOf(4))).sqrt(new MathContext(1000));
+        BigInteger v1 = t.subtract(q).divide(BigDecimal.valueOf(2), RoundingMode.HALF_EVEN).setScale(0, RoundingMode.DOWN).toBigInteger();
+        BigInteger v2 = t.add(q).divide(BigDecimal.valueOf(2), RoundingMode.HALF_EVEN).setScale(0, RoundingMode.UP).toBigInteger();
+        return v2.subtract(v1).subtract(BigInteger.ONE);
     }
 }
