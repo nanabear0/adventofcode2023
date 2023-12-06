@@ -9,7 +9,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
-import java.util.stream.LongStream;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -29,10 +28,8 @@ public class Main {
                 .mapToObj(i -> Pair.with(lines.get(0).get(i), lines.get(1).get(i)))
                 .toList();
 
-        long result = races.parallelStream().map(pair ->
-                        IntStream.range(0, pair.getValue0() + 1)
-                                .filter(hold -> pair.getValue0() * hold - hold * hold > pair.getValue1())
-                                .count())
+        long result = races.parallelStream()
+                .map(pair -> quadratic(pair.getValue0(), pair.getValue1()))
                 .reduce((x, y) -> x * y).orElseThrow();
         System.out.println("part01: " + result);
     }
@@ -47,10 +44,14 @@ public class Main {
         long time = lines.get(0);
         long distance = lines.get(1);
 
-        long result = LongStream.range(0, time + 1)
-                .parallel()
-                .filter(hold -> time * hold - hold * hold > distance)
-                .count();
+        long result = quadratic(time, distance);
         System.out.println("part02: " + result);
+    }
+
+    public static long quadratic(long t, long d) {
+        double q = Math.pow(t * t - 4 * d, 0.5);
+        double v1 = Math.floor((t - q) / 2 + 0.000000000001);
+        double v2 = Math.ceil((t + q) / 2 - 0.000000000001);
+        return (long) (v2 - v1 - 1);
     }
 }
