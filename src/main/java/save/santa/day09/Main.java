@@ -1,13 +1,12 @@
 package save.santa.day09;
 
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -16,18 +15,15 @@ public class Main {
     }
 
     public static int doPart(boolean reversed) throws IOException {
-        URL resource = Main.class.getClassLoader().getResource("day09-input.txt");
-        assert resource != null;
-        List<String> lines = Files.lines(Path.of(resource.getFile())).toList();
-
-        return lines.stream().map(line -> Arrays.stream(line.split(" +")).map(Integer::parseInt).toList()).map(startingNumbers -> {
-            List<List<Integer>> stages = new ArrayList<>() {{
-                add(reversed ? startingNumbers.reversed() : startingNumbers);
-            }};
-            do {
-                stages.add(IntStream.range(0, stages.getLast().size() - 1).mapToObj(i -> stages.getLast().get(i + 1) - stages.getLast().get(i)).toList());
-            } while (!stages.getLast().stream().allMatch(n -> n == 0));
-            return stages.stream().map(List::getLast).reduce(Integer::sum).orElse(0);
-        }).reduce(Integer::sum).orElseThrow();
+        return Files.lines(Path.of(Main.class.getClassLoader().getResource("day09-input.txt").getFile()))
+                .map(line -> Arrays.stream(line.split(" +"))
+                        .map(Integer::parseInt).toList())
+                .map(startingNumbers ->
+                        Stream.iterate(reversed ? startingNumbers.reversed() : startingNumbers,
+                                        last -> !last.stream().allMatch(n -> n == 0),
+                                        previous -> IntStream.range(0, previous.size() - 1).mapToObj(i -> previous.get(i + 1) - previous.get(i)).toList())
+                                .map(List::getLast).reduce(Integer::sum).orElse(0))
+                .reduce(Integer::sum)
+                .orElse(0);
     }
 }
