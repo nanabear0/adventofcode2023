@@ -60,9 +60,11 @@ public class Main {
                     break;
                 case 'L':
                     if (myDirection == 0) {
+                        rotation++;
                         onMyRight.add(addPoints(current, -1, 0));
                         onMyRight.add(addPoints(current, 0, 1));
                     } else {
+                        rotation--;
                         onMyLeft.add(addPoints(current, -1, 0));
                         onMyLeft.add(addPoints(current, 0, 1));
                     }
