@@ -59,14 +59,40 @@ public class Main {
                     onMyLeft.add(addPoints(current, myDirection == 0 ? 1 : -1, 0));
                     break;
                 case 'L':
-                    onMyRight.add(addPoints(current, myDirection == 1 ? -1 : 1, 0));
-                    onMyLeft.add(addPoints(current, myDirection == 0 ? 1 : -1, 0));
+                    if (myDirection == 0) {
+                        onMyRight.add(addPoints(current, -1, 0));
+                        onMyRight.add(addPoints(current, 0, 1));
+                    } else {
+                        onMyLeft.add(addPoints(current, -1, 0));
+                        onMyLeft.add(addPoints(current, 0, 1));
+                    }
                     break;
                 case 'J':
+                    if (myDirection == 3) {
+                        onMyRight.add(addPoints(current, 1, 0));
+                        onMyRight.add(addPoints(current, 0, 1));
+                    } else {
+                        onMyLeft.add(addPoints(current, 1, 0));
+                        onMyLeft.add(addPoints(current, 0, 1));
+                    }
                     break;
                 case 'F':
+                    if (myDirection == 1) {
+                        onMyRight.add(addPoints(current, -1, 0));
+                        onMyRight.add(addPoints(current, 0, -1));
+                    } else {
+                        onMyLeft.add(addPoints(current, -1, 0));
+                        onMyLeft.add(addPoints(current, 0, -1));
+                    }
                     break;
                 case '7':
+                    if (myDirection == 2) {
+                        onMyRight.add(addPoints(current, 1, 0));
+                        onMyRight.add(addPoints(current, 0, -1));
+                    } else {
+                        onMyLeft.add(addPoints(current, 1, 0));
+                        onMyLeft.add(addPoints(current, 0, -1));
+                    }
                     break;
             }
 
@@ -108,10 +134,36 @@ public class Main {
 
         onMyRight.retainAll(map.keySet());
         onMyRight.removeAll(loopSet);
+        onMyRight = addMeNeighbours(onMyRight, map, loopSet);
 
         onMyLeft.retainAll(map.keySet());
         onMyLeft.removeAll(loopSet);
+        onMyLeft = addMeNeighbours(onMyLeft, map, loopSet);
         System.out.println("part02: " + onMyRight.size() + " or " + onMyLeft.size());
+    }
+
+    public static Set<Pair<Integer, Integer>> addMeNeighbours(Set<Pair<Integer, Integer>> startSet, Map<Pair<Integer, Integer>, Character> map, Set<Pair<Integer, Integer>> loopSet) {
+        var currentSet = new HashSet<>(startSet);
+        while (true) {
+            Set<Pair<Integer, Integer>> newSet = new HashSet<>();
+            for (var elem : currentSet) {
+                newSet.add(addPoints(elem, 0,1));
+                newSet.add(addPoints(elem, 0,-1));
+                newSet.add(addPoints(elem, 0,0));
+                newSet.add(addPoints(elem, 1,1));
+                newSet.add(addPoints(elem, 1,-1));
+                newSet.add(addPoints(elem, 1,0));
+                newSet.add(addPoints(elem, -1,1));
+                newSet.add(addPoints(elem, -1,-1));
+                newSet.add(addPoints(elem, -1,0));
+            }
+            newSet.retainAll(map.keySet());
+            newSet.removeAll(loopSet);
+            newSet.removeAll(currentSet);
+            if(newSet.isEmpty()) break;
+            currentSet.addAll(newSet);
+        }
+        return currentSet;
     }
 
     public static int findEntranceDirection(Pair<Integer, Integer> current, Pair<Integer, Integer> previous) {
