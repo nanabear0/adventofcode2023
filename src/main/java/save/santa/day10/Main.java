@@ -35,16 +35,16 @@ public class Main {
         Pair<Integer, Integer> previous = start;
         if (List.of('F', '|', '7').contains(map.getOrDefault(addPoints(start, 0, -1), '.')))
             current = addPoints(start, 0, -1);
-        else if (List.of('L', '|', 'J').contains(map.getOrDefault(addPoints(start, 0, 1), '.')))
+        if (List.of('L', '|', 'J').contains(map.getOrDefault(addPoints(start, 0, 1), '.')))
             current = addPoints(start, 0, 1);
-        else if (List.of('F', '-', 'L').contains(map.getOrDefault(addPoints(start, -1, 0), '.')))
+        if (List.of('F', '-', 'L').contains(map.getOrDefault(addPoints(start, -1, 0), '.')))
             current = addPoints(start, -1, 0);
-        else if (List.of('J', '-', '7').contains(map.getOrDefault(addPoints(start, 1, 0), '.')))
+        if (List.of('J', '-', '7').contains(map.getOrDefault(addPoints(start, 1, 0), '.')))
             current = addPoints(start, 1, 0);
 
         Set<Pair<Integer, Integer>> onMyRight = new HashSet<>();
         Set<Pair<Integer, Integer>> onMyLeft = new HashSet<>();
-
+        int rotation = 0;
         do {
             loopSet.add(current);
             var tmp = current;
@@ -69,27 +69,33 @@ public class Main {
                     break;
                 case 'J':
                     if (myDirection == 3) {
+                        rotation++;
                         onMyRight.add(addPoints(current, 1, 0));
                         onMyRight.add(addPoints(current, 0, 1));
                     } else {
+                        rotation--;
                         onMyLeft.add(addPoints(current, 1, 0));
                         onMyLeft.add(addPoints(current, 0, 1));
                     }
                     break;
                 case 'F':
                     if (myDirection == 1) {
+                        rotation++;
                         onMyRight.add(addPoints(current, -1, 0));
                         onMyRight.add(addPoints(current, 0, -1));
                     } else {
+                        rotation--;
                         onMyLeft.add(addPoints(current, -1, 0));
                         onMyLeft.add(addPoints(current, 0, -1));
                     }
                     break;
                 case '7':
                     if (myDirection == 2) {
+                        rotation++;
                         onMyRight.add(addPoints(current, 1, 0));
                         onMyRight.add(addPoints(current, 0, -1));
                     } else {
+                        rotation--;
                         onMyLeft.add(addPoints(current, 1, 0));
                         onMyLeft.add(addPoints(current, 0, -1));
                     }
@@ -139,7 +145,7 @@ public class Main {
         onMyLeft.retainAll(map.keySet());
         onMyLeft.removeAll(loopSet);
         onMyLeft = addMeNeighbours(onMyLeft, map, loopSet);
-        System.out.println("part02: " + onMyRight.size() + " or " + onMyLeft.size());
+        System.out.println("part02: " + (rotation > 0 ? onMyLeft.size() : onMyRight.size()));
     }
 
     public static Set<Pair<Integer, Integer>> addMeNeighbours(Set<Pair<Integer, Integer>> startSet, Map<Pair<Integer, Integer>, Character> map, Set<Pair<Integer, Integer>> loopSet) {
@@ -147,20 +153,20 @@ public class Main {
         while (true) {
             Set<Pair<Integer, Integer>> newSet = new HashSet<>();
             for (var elem : currentSet) {
-                newSet.add(addPoints(elem, 0,1));
-                newSet.add(addPoints(elem, 0,-1));
-                newSet.add(addPoints(elem, 0,0));
-                newSet.add(addPoints(elem, 1,1));
-                newSet.add(addPoints(elem, 1,-1));
-                newSet.add(addPoints(elem, 1,0));
-                newSet.add(addPoints(elem, -1,1));
-                newSet.add(addPoints(elem, -1,-1));
-                newSet.add(addPoints(elem, -1,0));
+                newSet.add(addPoints(elem, 0, 1));
+                newSet.add(addPoints(elem, 0, -1));
+                newSet.add(addPoints(elem, 0, 0));
+                newSet.add(addPoints(elem, 1, 1));
+                newSet.add(addPoints(elem, 1, -1));
+                newSet.add(addPoints(elem, 1, 0));
+                newSet.add(addPoints(elem, -1, 1));
+                newSet.add(addPoints(elem, -1, -1));
+                newSet.add(addPoints(elem, -1, 0));
             }
             newSet.retainAll(map.keySet());
             newSet.removeAll(loopSet);
             newSet.removeAll(currentSet);
-            if(newSet.isEmpty()) break;
+            if (newSet.isEmpty()) break;
             currentSet.addAll(newSet);
         }
         return currentSet;
