@@ -29,82 +29,21 @@ public class Main {
             }
         }
 
-        Set<Pair<Integer, Integer>> loopSet = new HashSet<>();
-        loopSet.add(start);
-        Pair<Integer, Integer> current = start;
-        Pair<Integer, Integer> previous = start;
+        List<Pair<Integer, Integer>> loop = new ArrayList<>();
+        loop.add(start);
         if (List.of('F', '|', '7').contains(map.getOrDefault(addPoints(start, 0, -1), '.')))
-            current = addPoints(start, 0, -1);
-        if (List.of('L', '|', 'J').contains(map.getOrDefault(addPoints(start, 0, 1), '.')))
-            current = addPoints(start, 0, 1);
-        if (List.of('F', '-', 'L').contains(map.getOrDefault(addPoints(start, -1, 0), '.')))
-            current = addPoints(start, -1, 0);
-        if (List.of('J', '-', '7').contains(map.getOrDefault(addPoints(start, 1, 0), '.')))
-            current = addPoints(start, 1, 0);
+            loop.add(addPoints(start, 0, -1));
+        else if (List.of('L', '|', 'J').contains(map.getOrDefault(addPoints(start, 0, 1), '.')))
+            loop.add(addPoints(start, 0, 1));
+        else if (List.of('F', '-', 'L').contains(map.getOrDefault(addPoints(start, -1, 0), '.')))
+            loop.add(addPoints(start, -1, 0));
+        else if (List.of('J', '-', '7').contains(map.getOrDefault(addPoints(start, 1, 0), '.')))
+            loop.add(addPoints(start, 1, 0));
 
-        Set<Pair<Integer, Integer>> onMyRight = new HashSet<>();
-        Set<Pair<Integer, Integer>> onMyLeft = new HashSet<>();
-        int rotation = 0;
         do {
-            loopSet.add(current);
-            var tmp = current;
-            int myDirection = findEntranceDirection(current, previous);
-            switch (map.get(current)) {
-                case '-':
-                    onMyRight.add(addPoints(current, 0, myDirection == 1 ? -1 : 1));
-                    onMyLeft.add(addPoints(current, 0, myDirection == 1 ? 1 : -1));
-                    break;
-                case '|':
-                    onMyRight.add(addPoints(current, myDirection == 0 ? -1 : 1, 0));
-                    onMyLeft.add(addPoints(current, myDirection == 0 ? 1 : -1, 0));
-                    break;
-                case 'L':
-                    if (myDirection == 0) {
-                        rotation++;
-                        onMyRight.add(addPoints(current, -1, 0));
-                        onMyRight.add(addPoints(current, 0, 1));
-                    } else {
-                        rotation--;
-                        onMyLeft.add(addPoints(current, -1, 0));
-                        onMyLeft.add(addPoints(current, 0, 1));
-                    }
-                    break;
-                case 'J':
-                    if (myDirection == 3) {
-                        rotation++;
-                        onMyRight.add(addPoints(current, 1, 0));
-                        onMyRight.add(addPoints(current, 0, 1));
-                    } else {
-                        rotation--;
-                        onMyLeft.add(addPoints(current, 1, 0));
-                        onMyLeft.add(addPoints(current, 0, 1));
-                    }
-                    break;
-                case 'F':
-                    if (myDirection == 1) {
-                        rotation++;
-                        onMyRight.add(addPoints(current, -1, 0));
-                        onMyRight.add(addPoints(current, 0, -1));
-                    } else {
-                        rotation--;
-                        onMyLeft.add(addPoints(current, -1, 0));
-                        onMyLeft.add(addPoints(current, 0, -1));
-                    }
-                    break;
-                case '7':
-                    if (myDirection == 2) {
-                        rotation++;
-                        onMyRight.add(addPoints(current, 1, 0));
-                        onMyRight.add(addPoints(current, 0, -1));
-                    } else {
-                        rotation--;
-                        onMyLeft.add(addPoints(current, 1, 0));
-                        onMyLeft.add(addPoints(current, 0, -1));
-                    }
-                    break;
-            }
-
-            current = switch (myDirection) {
+            var current = loop.getLast();
+            var previous = loop.get(loop.size() - 2);
+            loop.add(switch (findEntranceDirection(current, previous)) {
                 case 0 -> // from top
                         switch (map.get(current)) {
                             case '|' -> addPoints(current, 0, 1);
@@ -134,44 +73,21 @@ public class Main {
                             default -> current;
                         };
                 default -> current;
-            };
-            previous = tmp;
-        } while (!current.equals(start));
+            });
+        } while (map.get(loop.getLast()) != 'S');
 
-        System.out.println("part01: " + loopSet.size() / 2);
+        System.out.println("part01: " + loop.size() / 2);
 
-        onMyRight.retainAll(map.keySet());
-        onMyRight.removeAll(loopSet);
-        onMyRight = addMeNeighbours(onMyRight, map, loopSet);
-
-        onMyLeft.retainAll(map.keySet());
-        onMyLeft.removeAll(loopSet);
-        onMyLeft = addMeNeighbours(onMyLeft, map, loopSet);
-        System.out.println("part02: " + (rotation > 0 ? onMyLeft.size() : onMyRight.size()));
-    }
-
-    public static Set<Pair<Integer, Integer>> addMeNeighbours(Set<Pair<Integer, Integer>> startSet, Map<Pair<Integer, Integer>, Character> map, Set<Pair<Integer, Integer>> loopSet) {
-        var currentSet = new HashSet<>(startSet);
-        while (true) {
-            Set<Pair<Integer, Integer>> newSet = new HashSet<>();
-            for (var elem : currentSet) {
-                newSet.add(addPoints(elem, 0, 1));
-                newSet.add(addPoints(elem, 0, -1));
-                newSet.add(addPoints(elem, 0, 0));
-                newSet.add(addPoints(elem, 1, 1));
-                newSet.add(addPoints(elem, 1, -1));
-                newSet.add(addPoints(elem, 1, 0));
-                newSet.add(addPoints(elem, -1, 1));
-                newSet.add(addPoints(elem, -1, -1));
-                newSet.add(addPoints(elem, -1, 0));
-            }
-            newSet.retainAll(map.keySet());
-            newSet.removeAll(loopSet);
-            newSet.removeAll(currentSet);
-            if (newSet.isEmpty()) break;
-            currentSet.addAll(newSet);
+        int area = 0;
+        for (int i = 0; i < loop.size(); i++) {
+            var p1 = loop.get(i);
+            var p2 = loop.get((i + 1) % loop.size());
+            area += p1.getValue0() * p2.getValue1() - p1.getValue1() * p2.getValue0();
         }
-        return currentSet;
+        area /= 2;
+
+        int pointsInside = area + 1 - loop.size() / 2;
+        System.out.println("part02: " + pointsInside);
     }
 
     public static int findEntranceDirection(Pair<Integer, Integer> current, Pair<Integer, Integer> previous) {
