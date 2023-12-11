@@ -66,7 +66,7 @@ public class Main {
         if (List.of('F', '-', 'L').contains(map.getOrDefault(addPoints(start, -1, 0), '.')))
             return addPoints(start, -1, 0);
         if (List.of('J', '-', '7').contains(map.getOrDefault(addPoints(start, 1, 0), '.')))
-            addPoints(start, 1, 0);
+            return addPoints(start, 1, 0);
 
         throw new RuntimeException();
     }
