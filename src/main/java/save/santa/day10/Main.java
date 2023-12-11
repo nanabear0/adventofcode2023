@@ -28,7 +28,7 @@ public class Main {
         }
         area /= 2;
 
-        int pointsInside = area + 1 - loop.size() / 2;
+        int pointsInside = Math.abs(area) + 1 - loop.size() / 2;
 
         System.out.println("part02: " + pointsInside);
     }
@@ -36,7 +36,7 @@ public class Main {
     private static List<Pair<Integer, Integer>> fillLoop(Pair<Integer, Integer> start, Map<Pair<Integer, Integer>, Character> map) {
         List<Pair<Integer, Integer>> loop = new ArrayList<>();
         loop.add(start);
-        findFirstStep(map, start, loop);
+        loop.add(findFirstStep(map, start));
 
         do {
             var current = loop.getLast();
@@ -58,15 +58,17 @@ public class Main {
         return start;
     }
 
-    private static void findFirstStep(Map<Pair<Integer, Integer>, Character> map, Pair<Integer, Integer> start, List<Pair<Integer, Integer>> loop) {
+    private static Pair<Integer, Integer> findFirstStep(Map<Pair<Integer, Integer>, Character> map, Pair<Integer, Integer> start) {
         if (List.of('F', '|', '7').contains(map.getOrDefault(addPoints(start, 0, -1), '.')))
-            loop.add(addPoints(start, 0, -1));
-        else if (List.of('L', '|', 'J').contains(map.getOrDefault(addPoints(start, 0, 1), '.')))
-            loop.add(addPoints(start, 0, 1));
-        else if (List.of('F', '-', 'L').contains(map.getOrDefault(addPoints(start, -1, 0), '.')))
-            loop.add(addPoints(start, -1, 0));
-        else if (List.of('J', '-', '7').contains(map.getOrDefault(addPoints(start, 1, 0), '.')))
-            loop.add(addPoints(start, 1, 0));
+            return addPoints(start, 0, -1);
+        if (List.of('L', '|', 'J').contains(map.getOrDefault(addPoints(start, 0, 1), '.')))
+            return addPoints(start, 0, 1);
+        if (List.of('F', '-', 'L').contains(map.getOrDefault(addPoints(start, -1, 0), '.')))
+            return addPoints(start, -1, 0);
+        if (List.of('J', '-', '7').contains(map.getOrDefault(addPoints(start, 1, 0), '.')))
+            addPoints(start, 1, 0);
+
+        throw new RuntimeException();
     }
 
     private static Pair<Integer, Integer> findNextPoint(
