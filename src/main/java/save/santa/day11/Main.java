@@ -1,5 +1,6 @@
 package save.santa.day11;
 
+import org.apache.commons.lang3.time.StopWatch;
 import org.javatuples.Pair;
 
 import java.io.IOException;
@@ -13,8 +14,13 @@ import java.util.stream.IntStream;
 
 public class Main {
     public static void main(String[] args) throws IOException {
+        StopWatch watch = new StopWatch();
+        watch.start();
         System.out.println("part01: " + part01(2));
         System.out.println("part02: " + part01(1_000_000));
+        watch.stop();
+
+        System.out.println("Time: " + watch.formatTime());
     }
 
     public static long part01(int expansionFactor) throws IOException {
@@ -40,6 +46,7 @@ public class Main {
         return stars.stream()
                 .flatMap(star1 -> stars.stream().map(star2 -> Pair.with(star1, star2)))
                 .filter(starPair -> !starPair.getValue0().equals(starPair.getValue1()))
+                .parallel()
                 .map(starPair -> distanceBetweenStars(starPair.getValue0(), starPair.getValue1(), emptyXs, emptyYs, expansionFactor))
                 .reduce(Long::sum)
                 .orElseThrow() / 2;
