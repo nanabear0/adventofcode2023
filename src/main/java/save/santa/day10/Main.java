@@ -12,8 +12,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         URL resource = save.santa.day08.Main.class.getClassLoader().getResource("day10-input.txt");
         assert resource != null;
-        var lines = Files.lines(Path.of(resource.getFile()))
-                .toList();
+        var lines = Files.lines(Path.of(resource.getFile())).toList();
 
         Map<Pair<Integer, Integer>, Character> map = new HashMap<>();
         Pair<Integer, Integer> start = fillMapAndReturnStart(lines, map);
