@@ -80,30 +80,30 @@ public class Main {
                         case '|' -> addPoints(current, 0, 1);
                         case 'J' -> addPoints(current, -1, 0);
                         case 'L' -> addPoints(current, 1, 0);
-                        default -> current;
+                        default -> throw new RuntimeException();
                     };
             case 1 ->  // from right
                     switch (map.get(current)) {
                         case '-' -> addPoints(current, -1, 0);
                         case 'L' -> addPoints(current, 0, -1);
                         case 'F' -> addPoints(current, 0, 1);
-                        default -> current;
+                        default -> throw new RuntimeException();
                     };
             case 2 ->  // from bottom
                     switch (map.get(current)) {
                         case '|' -> addPoints(current, 0, -1);
                         case '7' -> addPoints(current, -1, 0);
                         case 'F' -> addPoints(current, 1, 0);
-                        default -> current;
+                        default -> throw new RuntimeException();
                     };
             case 3 ->  // from left
                     switch (map.get(current)) {
                         case '-' -> addPoints(current, 1, 0);
                         case 'J' -> addPoints(current, 0, -1);
                         case '7' -> addPoints(current, 0, 1);
-                        default -> current;
+                        default -> throw new RuntimeException();
                     };
-            default -> current;
+            default -> throw new RuntimeException();
         };
     }
 
