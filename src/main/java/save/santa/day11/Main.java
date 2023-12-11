@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -20,19 +19,15 @@ public class Main {
 
     public static long part01(int expansionFactor) throws IOException {
         URL resource = Main.class.getClassLoader().getResource("day11-input.txt");
-        assert resource != null;
         List<String> lines = Files.lines(Path.of(resource.getFile())).toList();
-        Set<Pair<Integer, Integer>> stars = new TreeSet<>();
+
         int boundaryX = lines.get(0).length();
         int boundaryY = lines.size();
+        Set<Pair<Integer, Integer>> stars = IntStream.range(0, boundaryY).boxed()
+                .flatMap(y -> IntStream.range(0, boundaryX).mapToObj(x -> Pair.with(x, y)))
+                .filter(pair -> lines.get(pair.getValue1()).charAt(pair.getValue0()) == '#')
+                .collect(Collectors.toSet());
 
-        for (int y = 0; y < boundaryY; y++) {
-            for (int x = 0; x < boundaryX; x++) {
-                if (lines.get(y).charAt(x) == '#') {
-                    stars.add(Pair.with(x, y));
-                }
-            }
-        }
         Set<Integer> emptyXs = IntStream.range(0, boundaryX)
                 .filter(x -> IntStream.range(0, boundaryY)
                         .noneMatch(y -> stars.contains(Pair.with(x, y))))
@@ -44,7 +39,6 @@ public class Main {
 
         return stars.stream()
                 .flatMap(star1 -> stars.stream().map(star2 -> Pair.with(star1, star2)))
-                .parallel()
                 .filter(starPair -> !starPair.getValue0().equals(starPair.getValue1()))
                 .map(starPair -> distanceBetweenStars(starPair.getValue0(), starPair.getValue1(), emptyXs, emptyYs, expansionFactor))
                 .reduce(Long::sum)
