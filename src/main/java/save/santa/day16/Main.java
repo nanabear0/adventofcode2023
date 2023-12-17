@@ -22,7 +22,7 @@ public class Main {
             }
         }
         Pair<Integer, Integer> target = Pair.with(lines.get(0).length() - 1, lines.size() - 1);
-//        System.out.println("part01: " + doPart(target, lossMap, 0, 3));
+        System.out.println("part01: " + doPart(target, lossMap, 0, 3));
         System.out.println("part02: " + doPart(target, lossMap, 4, 10));
     }
 
@@ -32,13 +32,15 @@ public class Main {
         PriorityQueue<Quartet<Integer, Integer, Integer, Integer>> frontier = new PriorityQueue<>(Comparator.comparing(distance::get));
         distance.put(Quartet.with(0, 0, 0, 0), 0);
         frontier.add(Quartet.with(0, 0, 0, 0));
-        int result;
 
-        while (true) {
+        while (!frontier.isEmpty()) {
             Quartet<Integer, Integer, Integer, Integer> current = frontier.remove();
-            if (Objects.equals(current.getValue0(), target.getValue0()) && current.getValue1().equals(target.getValue1())) {
-                result = distance.get(current);
-                break;
+            if (
+                    Objects.equals(current.getValue0(), target.getValue0()) &&
+                            current.getValue1().equals(target.getValue1()) &&
+                            Math.abs(current.getValue2() + current.getValue3()) >= minTurn
+            ) {
+                return distance.get(current);
             }
 
             List<Pair<Quartet<Integer, Integer, Integer, Integer>, Integer>> nps =
@@ -54,15 +56,14 @@ public class Main {
             finished.add(current);
             frontier.addAll(nfa);
         }
-
-        return result;
+        return -1;
     }
 
     public static Quartet<Integer, Integer, Integer, Integer> move(Quartet<Integer, Integer, Integer, Integer> initial, Pair<Integer, Integer> dir, int minTurn, int maxStraight) {
         if (!(initial.getValue2() == 0 && initial.getValue3() == 0)) {
             if (dir.getValue0() != 0 && initial.getValue2() * dir.getValue0() < 0) return null;
             if (dir.getValue1() != 0 && initial.getValue3() * dir.getValue1() < 0) return null;
-            boolean isTurn = (dir.getValue0() != 0 ^ initial.getValue2() != 0) || (dir.getValue1() != 0 ^ initial.getValue3() != 0);
+            boolean isTurn = (dir.getValue0() != 0 ^ initial.getValue2() != 0) && (dir.getValue1() != 0 ^ initial.getValue3() != 0);
             if (isTurn && Math.abs(initial.getValue2() + initial.getValue3()) < minTurn) return null;
             if (!isTurn && Math.abs(initial.getValue2() + initial.getValue3()) >= maxStraight) return null;
         }
