@@ -16,7 +16,7 @@ public class Main {
         List<String> lines = Files.lines(Path.of(resource.getFile().substring(1))).toList();
 
         System.out.println("part01: " + part01(lines));
-//        System.out.println("part02: " + doPart(target, lossMap, 4, 10));
+        System.out.println("part02: " + part02(lines));
     }
 
     private static long part01(List<String> lines) {
@@ -40,6 +40,34 @@ public class Main {
             vertices.add(current);
         }
 
+        return findArea(vertices, circumference);
+    }
+
+    private static long part02(List<String> lines) {
+        List<Pair<Long, Long>> vertices = new ArrayList<>();
+        long circumference = 0;
+
+        Pair<Long, Long> current = Pair.with(0L, 0L);
+        vertices.add(current);
+        for (String line : lines) {
+            String f = line.split(" +")[2].replaceAll("[#()]", "");
+            long distance = Long.parseLong(f.substring(0, 5), 16);
+            circumference += distance;
+
+            current = switch (f.charAt(5)) {
+                case '3' -> current.setAt1(current.getValue1() - distance);
+                case '0' -> current.setAt0(current.getValue0() + distance);
+                case '1' -> current.setAt1(current.getValue1() + distance);
+                case '2' -> current.setAt0(current.getValue0() - distance);
+                default -> current;
+            };
+            vertices.add(current);
+        }
+
+        return findArea(vertices, circumference);
+    }
+
+    private static long findArea(List<Pair<Long, Long>> vertices, long circumference) {
         long area = 0;
         for (int i = 0; i < vertices.size() - 1; i++) {
             var p1 = vertices.get(i);
@@ -48,8 +76,6 @@ public class Main {
         }
         area /= 2;
         long pointsInside = Math.abs(area) + 1 - circumference / 2;
-        long totalArea = pointsInside + circumference;
-
-        return totalArea;
+        return pointsInside + circumference;
     }
 }
