@@ -112,25 +112,18 @@ public class Main {
         int sum = 0;
         for (var part : parts) {
             var currentOpKey = "in";
-            Boolean result = null;
-            while (result == null) {
+            while (!currentOpKey.matches("([AR])")) {
                 for (var step : operations.get(currentOpKey)) {
                     if (step.getValue0() == null ||
                             (step.getValue1().equals(">") && part.get(step.getValue0()) > step.getValue2()) ||
                             (step.getValue1().equals("<") && part.get(step.getValue0()) < step.getValue2())
                     ) {
-                        if (step.getValue3().equals("A")) {
-                            result = Boolean.TRUE;
-                        } else if (step.getValue3().equals("R")) {
-                            result = Boolean.FALSE;
-                        } else {
-                            currentOpKey = step.getValue3();
-                        }
+                        currentOpKey = step.getValue3();
                         break;
                     }
                 }
             }
-            if (result) {
+            if (currentOpKey.equals("A")) {
                 sum += part.values().stream().reduce(Long::sum).orElse(0L);
             }
         }
