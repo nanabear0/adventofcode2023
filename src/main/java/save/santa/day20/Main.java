@@ -51,8 +51,7 @@ public class Main {
 
         long highPulses = 0L;
         long lowPulses = 0L;
-        for (int i = 0; i < 1000; i++) {
-            System.out.println();
+        for (long i = 0; i < 10_000_000_000_000L; i++) {
             List<Triplet<String, String, Boolean>> pulses = List.of(Triplet.with("button", "broadcaster", Boolean.FALSE));
             while (!pulses.isEmpty()) {
                 for (var pulse : pulses) {
@@ -65,6 +64,14 @@ public class Main {
                     String source = pulse.getValue0();
                     String target = pulse.getValue1();
                     Boolean value = pulse.getValue2();
+
+                    if (target.equals("tj")) {
+                        long finalI = i;
+                        states.get("tj").entrySet().stream()
+                                .filter((entry) -> entry.getValue())
+                                .forEach((entry) -> System.out.println(finalI + ": " + entry.getKey() + " is high"));
+                    }
+
                     if (!modules.containsKey(target)) continue;
                     if ("broadcaster".equals(target)) {
                         modules.get(target).getValue1().forEach(next -> nextPulses.add(Triplet.with(target, next, value)));

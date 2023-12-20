@@ -1,21 +1,18 @@
 %gv -> lq, pm
 %rv -> jd, nh
 %nh -> rs, jd
-&vt -> tj
 %zv -> pm, gv
 %gh -> jd, vd
 %hh -> bf, qm
 %kx -> nf
 %st -> pm, zc
 %bh -> qm, pv
-&sk -> tj
 %hl -> nf, pn
 %mt -> st, pm
 &jd -> ts, gh, vd, dc, xc
 %zm -> hm
 %pv -> vv
 %zf -> nf, cz
-&xc -> tj
 %bf -> qm
 %ts -> sg
 %ht -> ch, nf
@@ -39,7 +36,6 @@ broadcaster -> gh, dl, xg, fb
 %hm -> nf, hl
 %gd -> sr
 &qm -> lc, pv, nx, fb, kk
-&tj -> rx
 %gb -> qq, jd
 %xf -> zf
 %tb -> lg
@@ -51,8 +47,12 @@ broadcaster -> gh, dl, xg, fb
 %pn -> nf, kx
 %fc -> xb, qm
 %ch -> xf
-&kk -> tj
 %lg -> pm, gd
 %sv -> nf, ht
 %xb -> qm, lc
 %dr -> nx, qm
+&vt -> tj
+&sk -> tj
+&xc -> tj
+&kk -> tj
+&tj -> rx
