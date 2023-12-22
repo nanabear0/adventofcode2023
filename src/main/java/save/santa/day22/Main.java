@@ -61,7 +61,7 @@ public class Main {
             }
         } while (movedAnything);
 
-        List<List<Integer>> imCriticalSupportOf = IntStream.range(0, shapes.size()).mapToObj(x -> new ArrayList<Integer>().reversed()).toList();
+        List<ArrayList<Integer>> imCriticalSupportOf = IntStream.range(0, shapes.size()).mapToObj(x -> new ArrayList<Integer>()).toList();
         List<HashSet<Integer>> imSupporting = IntStream.range(0, shapes.size()).mapToObj(x -> new HashSet<Integer>()).toList();
         List<HashSet<Integer>> imSupportedBy = IntStream.range(0, shapes.size()).mapToObj(x -> new HashSet<Integer>()).toList();
         for (var shape : shapes.entrySet()) {
