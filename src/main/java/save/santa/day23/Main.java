@@ -107,17 +107,18 @@ public class Main {
                 continue;
             }
 
-            for (var targetEntry : distanceToNeighbours.get(head).entrySet().stream()
-                    .filter(entry -> !visitedNodes.contains(entry.getKey())).toList()) {
-                currentHikes.add(Triplet.with(new HashSet<>() {
-                                                  {
-                                                      addAll(visitedNodes);
-                                                      add(targetEntry.getKey());
-                                                  }
-                                              },
-                        targetEntry.getKey(),
-                        currentDistance + targetEntry.getValue()));
-            }
+            distanceToNeighbours.get(head).entrySet().stream()
+                    .filter(entry -> !visitedNodes.contains(entry.getKey()))
+                    .forEach(targetEntry ->
+                            currentHikes.add(Triplet.with(new HashSet<>() {
+                                                              {
+                                                                  addAll(visitedNodes);
+                                                                  add(targetEntry.getKey());
+                                                              }
+                                                          },
+                                    targetEntry.getKey(),
+                                    currentDistance + targetEntry.getValue()))
+                    );
         }
 
         return longestHike;
