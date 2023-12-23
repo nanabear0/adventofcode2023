@@ -15,8 +15,8 @@ import java.util.stream.Stream;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        part01();
-        part02();
+        System.out.println("part01: " + doPart(false));
+        System.out.println("part02: " + doPart(true));
     }
 
     public static HashMap<Character, Pair<Integer, Integer>> doDir = new HashMap<>() {{
@@ -26,7 +26,7 @@ public class Main {
         put('v', Pair.with(0, 1));
     }};
 
-    public static void part02() throws IOException {
+    public static long doPart(boolean noSlope) throws IOException {
         StopWatch watch = new StopWatch();
         watch.start();
         URL resource = Main.class.getClassLoader().getResource("day23-input.txt");
@@ -64,15 +64,18 @@ public class Main {
                 var current = probe;
                 var last = intersection;
                 int distance = 1;
+                Pair<Integer, Integer> nextDir = null;
                 while (true) {
                     Pair<Integer, Integer> finalCurrent = current;
                     Pair<Integer, Integer> finalLast = last;
-                    var option = Stream.of(Pair.with(0, -1), Pair.with(0, 1), Pair.with(-1, 0), Pair.with(1, 0))
+                    var option = (nextDir != null ? Stream.of(nextDir) : Stream.of(Pair.with(0, -1), Pair.with(0, 1), Pair.with(-1, 0), Pair.with(1, 0)))
                             .map(dir -> addDir(finalCurrent, dir))
                             .filter(target -> isFreeSpace(charMap.getOrDefault(target, 'X')))
                             .filter(target -> !target.equals(finalLast))
                             .findFirst();
                     if (option.isEmpty()) break;
+                    nextDir = !noSlope && List.of('.', 'v', '^', '>', '<').contains(charMap.get(option.get())) ?
+                            doDir.get(charMap.get(option.get())) : null;
                     distance++;
                     last = current;
                     current = option.get();
@@ -117,71 +120,7 @@ public class Main {
             }
         }
 
-        watch.stop();
-        System.out.println("part01: " + longestHike + ", in:" + watch.formatTime());
-    }
-
-    public static void part01() throws IOException {
-        StopWatch watch = new StopWatch();
-        watch.start();
-        URL resource = Main.class.getClassLoader().getResource("day23-input.txt");
-        assert resource != null;
-        List<String> lines = Files.lines(Path.of(resource.getFile())).toList();
-
-        Map<Pair<Integer, Integer>, Character> map = new HashMap<>();
-        for (int y = 0; y < lines.size(); y++) {
-            for (int x = 0; x < lines.get(y).length(); x++) {
-                map.put(Pair.with(x, y), lines.get(y).charAt(x));
-            }
-        }
-        Pair<Integer, Integer> start = Pair.with(1, 0);
-        Pair<Integer, Integer> end = Pair.with(lines.getLast().length() - 2, lines.size() - 1);
-
-        int longestHike = Integer.MIN_VALUE;
-        Stack<Pair<HashSet<Pair<Integer, Integer>>, Pair<Integer, Integer>>> currentHikes = new Stack<>() {{
-            push(Pair.with(new HashSet<>() {{
-                add(start);
-            }}, start));
-        }};
-
-        while (!currentHikes.isEmpty()) {
-            var currentHike = currentHikes.pop();
-            var visitedNodes = currentHike.getValue0();
-            var head = currentHike.getValue1();
-
-            if (head.equals(end)) {
-                longestHike = Math.max(longestHike, visitedNodes.size());
-                continue;
-            }
-
-            for (var target : Stream.of(Pair.with(0, -1), Pair.with(0, 1), Pair.with(-1, 0), Pair.with(1, 0))
-                    .map(dir -> addDir(head, dir))
-                    .filter(target -> List.of('.', 'v', '^', '>', '<').contains(map.getOrDefault(target, 'X')))
-                    .filter(target -> !visitedNodes.contains(target))
-                    .toList()
-            ) {
-                if (map.get(target).equals('.')) {
-                    currentHikes.add(Pair.with(new HashSet<>() {
-                        {
-                            addAll(visitedNodes);
-                            add(target);
-                        }
-                    }, target));
-                } else {
-                    var next = addDir(target, doDir.get(map.get(target)));
-                    if (next.equals(target) || map.get(next).equals('#') || visitedNodes.contains(next)) continue;
-                    currentHikes.add(Pair.with(new HashSet<>() {
-                        {
-                            addAll(visitedNodes);
-                            add(target);
-                            add(next);
-                        }
-                    }, next));
-                }
-            }
-        }
-        watch.stop();
-        System.out.println("part01: " + (longestHike - 1) + ", in:" + watch.formatTime());
+        return longestHike;
     }
 
     public static boolean isFreeSpace(Character c) {
